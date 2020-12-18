@@ -217,7 +217,8 @@ class LimeImageExplainer(object):
         for label in top:
             (ret_exp.intercept[label],
              ret_exp.local_exp[label],
-             ret_exp.score[label], ret_exp.local_pred[label]) = self.base.explain_instance_with_data(
+             ret_exp.score[label],
+             ret_exp.local_pred[label]) = self.base.explain_instance_with_data(
                 data, labels, distances, label, num_features,
                 model_regressor=model_regressor,
                 feature_selection=self.feature_selection)
