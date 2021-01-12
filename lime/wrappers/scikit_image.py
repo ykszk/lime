@@ -20,9 +20,6 @@ class BaseWrapper(object):
         self.target_fn = target_fn
         self.target_params = target_params
 
-        self.target_fn = target_fn
-        self.target_params = target_params
-
     def _check_params(self, parameters):
         """Checks for mistakes in 'parameters'
 
