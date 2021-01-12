@@ -6,7 +6,6 @@ from functools import partial
 
 import numpy as np
 import sklearn
-import sklearn.preprocessing
 from sklearn.utils import check_random_state
 from skimage.color import gray2rgb
 from tqdm.auto import tqdm
