@@ -643,6 +643,8 @@ class RecurrentTabularExplainer(LimeTabularExplainer):
                 n_samples, n_timesteps * n_features)
         self.n_timesteps = n_timesteps
         self.n_features = n_features
+        if feature_names is None:
+            feature_names = ['feature%d' % i for i in range(n_features)]
 
         # Update the feature names
         feature_names = ['{}_t-{}'.format(n, n_timesteps - (i + 1))
