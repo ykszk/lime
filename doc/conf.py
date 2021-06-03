@@ -26,17 +26,21 @@ sys.path.insert(0, curr_path)
 
 import mock
 MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.special',
-                'scipy.stats','sklearn', 'sklearn.preprocessing',
+                'scipy.stats', 'scipy.stats.distributions', 'sklearn', 'sklearn.preprocessing',
                 'sklearn.linear_model', 'matplotlib',
         'sklearn.datasets', 'sklearn.ensemble', 'sklearn.cross_validation',
         'sklearn.feature_extraction', 'sklearn.feature_extraction.text',
         'sklearn.metrics', 'sklearn.naive_bayes', 'sklearn.pipeline',
         'sklearn.utils', 'pyDOE2',]
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+# for mod_name in MOCK_MODULES:
+#     sys.modules[mod_name] = mock.Mock()
 
+import scipy
+import scipy.stats
+import scipy.stats.distributions
 import lime
 import lime.lime_text
+
 import lime.lime_tabular
 import lime.explanation
 import lime.lime_base
