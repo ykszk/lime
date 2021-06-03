@@ -149,13 +149,14 @@ class LimeImageExplainer(object):
                 takes a numpy array and outputs prediction probabilities.  For
                 ScikitClassifiers , this is classifier.predict_proba.
             labels: iterable with labels to be explained.
-            hide_color: TODO
+            hide_color: If not None, will hide superpixels with this color.
+                Otherwise, use the mean pixel color of the image.
             top_labels: if not None, ignore labels and produce explanations for
                 the K labels with highest prediction probabilities, where K is
                 this parameter.
             num_features: maximum number of features present in explanation
             num_samples: size of the neighborhood to learn the linear model
-            batch_size: TODO
+            batch_size: batch size for model predictions
             distance_metric: the distance metric to use for weights.
             model_regressor: sklearn regressor to use in explanation. Defaults
             to Ridge regression in LimeBase. Must have model_regressor.coef_
