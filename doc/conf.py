@@ -44,6 +44,7 @@ import lime.lime_text
 import lime.lime_tabular
 import lime.explanation
 import lime.lime_base
+import lime.submodular_pick
 
 # -- General configuration ------------------------------------------------
 
