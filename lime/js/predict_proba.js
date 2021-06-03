@@ -76,7 +76,7 @@ class PredictProba {
         // todo
         let cur_text = text.text().slice(0, text.text().length - 5);
         text.text(cur_text + '...');
-        if (cur_text === '') {
+        if (cur_text.length <= 3) {
           break
         }
       }
