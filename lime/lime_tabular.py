@@ -13,6 +13,9 @@ import sklearn
 import sklearn.preprocessing
 from sklearn.utils import check_random_state
 from pyDOE2 import lhs
+import scipy
+import scipy.stats
+import scipy.stats.distributions
 from scipy.stats.distributions import norm
 
 from lime.discretize import QuartileDiscretizer

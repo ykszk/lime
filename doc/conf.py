@@ -25,12 +25,13 @@ sys.path.insert(0, libpath)
 sys.path.insert(0, curr_path)
 
 import mock
-MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'sklearn',
-        'sklearn.preprocessing', 'sklearn.linear_model', 'matplotlib',
+MOCK_MODULES = ['numpy', 'scipy', 'scipy.sparse', 'scipy.special',
+                'scipy.stats','sklearn', 'sklearn.preprocessing',
+                'sklearn.linear_model', 'matplotlib',
         'sklearn.datasets', 'sklearn.ensemble', 'sklearn.cross_validation',
         'sklearn.feature_extraction', 'sklearn.feature_extraction.text',
         'sklearn.metrics', 'sklearn.naive_bayes', 'sklearn.pipeline',
-        'sklearn.utils']
+        'sklearn.utils', 'pyDOE2',]
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
