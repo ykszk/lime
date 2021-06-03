@@ -68,6 +68,15 @@ lime\.lime\_text module
     :show-inheritance:
 
 
+lime\.submodular\_pick module
+-----------------------
+
+.. automodule:: lime.submodular_pick
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 Module contents
 ---------------
 
