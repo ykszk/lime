@@ -158,6 +158,7 @@ class Explanation(object):
             label: desired label. If you ask for a label for which an
                    explanation wasn't computed, will throw an exception.
                    Will be ignored for regression explanations.
+            figsize: desired size of pyplot in tuple format, defaults to (4,4).
             kwargs: keyword arguments, passed to domain_mapper
 
         Returns:
