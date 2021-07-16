@@ -176,7 +176,7 @@ class Explanation(object):
         plt.barh(pos, vals, align='center', color=colors)
         plt.yticks(pos, names)
         if self.mode == "classification":
-            title = f'Local explanation for class {self.class_names[label]}'
+            title = 'Local explanation for class %s' % self.class_names[label]
         else:
             title = 'Local explanation'
         plt.title(title)
