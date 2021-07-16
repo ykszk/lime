@@ -166,7 +166,7 @@ class Explanation(object):
         """
         import matplotlib.pyplot as plt
         exp = self.as_list(label=label, **kwargs)
-        fig = plt.figure(figsize)
+        fig = plt.figure(figsize=figsize)
         vals = [x[1] for x in exp]
         names = [x[0] for x in exp]
         vals.reverse()
