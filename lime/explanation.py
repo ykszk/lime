@@ -150,7 +150,7 @@ class Explanation(object):
         """
         return self.local_exp
 
-    def as_pyplot_figure(self, label=1, **kwargs):
+    def as_pyplot_figure(self, label=1, figsize=(4,4), **kwargs):
         """Returns the explanation as a pyplot figure.
 
         Will throw an error if you don't have matplotlib installed
@@ -165,7 +165,7 @@ class Explanation(object):
         """
         import matplotlib.pyplot as plt
         exp = self.as_list(label=label, **kwargs)
-        fig = plt.figure()
+        fig = plt.figure(figsize)
         vals = [x[1] for x in exp]
         names = [x[0] for x in exp]
         vals.reverse()
@@ -175,7 +175,7 @@ class Explanation(object):
         plt.barh(pos, vals, align='center', color=colors)
         plt.yticks(pos, names)
         if self.mode == "classification":
-            title = 'Local explanation for class %s' % self.class_names[label]
+            title = f'Local explanation for class {self.class_names[label]}'
         else:
             title = 'Local explanation'
         plt.title(title)
