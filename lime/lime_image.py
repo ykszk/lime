@@ -67,14 +67,18 @@ class ImageExplanation(object):
         if positive_only:
             fs = [x[0] for x in exp
                   if x[1] > 0 and x[1] > min_weight][:num_features]
+            local_exps = [x[1] for x in exp
+                  if x[1] > 0 and x[1] > min_weight][:num_features]
         if negative_only:
             fs = [x[0] for x in exp
+                  if x[1] < 0 and abs(x[1]) > min_weight][:num_features]
+            local_exps = [x[1] for x in exp
                   if x[1] < 0 and abs(x[1]) > min_weight][:num_features]
         if positive_only or negative_only:
             for f in fs:
                 temp[segments == f] = image[segments == f].copy()
                 mask[segments == f] = 1
-            return temp, mask
+            return temp, mask, fs, local_exps
         else:
             for f, w in exp[:num_features]:
                 if np.abs(w) < min_weight:
@@ -83,7 +87,7 @@ class ImageExplanation(object):
                 mask[segments == f] = -1 if w < 0 else 1
                 temp[segments == f] = image[segments == f].copy()
                 temp[segments == f, c] = np.max(image)
-            return temp, mask
+            return temp, mask, [f[0] for f in exp[:num_features]], [f[1] for f in exp[:num_features]]
 
 
 class LimeImageExplainer(object):
@@ -128,8 +132,10 @@ class LimeImageExplainer(object):
 
     def explain_instance(self, image, classifier_fn, labels=(1,),
                          hide_color=None,
+                         fudged_image=None,
                          top_labels=5, num_features=100000, num_samples=1000,
                          batch_size=10,
+                         n_jobs=1,
                          segmentation_fn=None,
                          distance_metric='cosine',
                          model_regressor=None,
@@ -183,21 +189,23 @@ class LimeImageExplainer(object):
                                                     random_seed=random_seed)
         segments = segmentation_fn(image)
 
-        fudged_image = image.copy()
-        if hide_color is None:
-            for x in np.unique(segments):
-                fudged_image[segments == x] = (
-                    np.mean(image[segments == x][:, 0]),
-                    np.mean(image[segments == x][:, 1]),
-                    np.mean(image[segments == x][:, 2]))
-        else:
-            fudged_image[:] = hide_color
+        if fudged_image is None:
+            fudged_image = image.copy()
+            if hide_color is None:
+                for x in np.unique(segments):
+                    fudged_image[segments == x] = (
+                        np.mean(image[segments == x][:, 0]),
+                        np.mean(image[segments == x][:, 1]),
+                        np.mean(image[segments == x][:, 2]))
+            else:
+                fudged_image[:] = hide_color
 
         top = labels
 
         data, labels = self.data_labels(image, fudged_image, segments,
                                         classifier_fn, num_samples,
                                         batch_size=batch_size,
+                                        n_jobs=n_jobs,
                                         progress_bar=progress_bar)
 
         distances = sklearn.metrics.pairwise_distances(
@@ -228,6 +236,7 @@ class LimeImageExplainer(object):
                     classifier_fn,
                     num_samples,
                     batch_size=10,
+                    n_jobs=1,
                     progress_bar=True):
         """Generates images and predictions in the neighborhood of this image.
 
@@ -240,6 +249,7 @@ class LimeImageExplainer(object):
                 matrix of prediction probabilities
             num_samples: size of the neighborhood to learn the linear model
             batch_size: classifier_fn will be called on batches of this size.
+            n_jobs: number of concurrent jobs for preprocessing
             progress_bar: if True, show tqdm progress bar.
 
         Returns:
@@ -248,25 +258,26 @@ class LimeImageExplainer(object):
                 labels: prediction probabilities matrix
         """
         n_features = np.unique(segments).shape[0]
-        data = self.random_state.randint(0, 2, num_samples * n_features)\
-            .reshape((num_samples, n_features))
+        data = self.random_state.randint(0, 2, num_samples * n_features).reshape((num_samples, n_features))
         labels = []
         data[0, :] = 1
-        imgs = []
-        rows = tqdm(data) if progress_bar else data
-        for row in rows:
+        from joblib import Parallel, delayed
+        def create_neighbor(row):
             temp = copy.deepcopy(image)
             zeros = np.where(row == 0)[0]
-            mask = np.zeros(segments.shape).astype(bool)
+            mask = np.zeros(segments.shape, dtype=bool)
             for z in zeros:
                 mask[segments == z] = True
             temp[mask] = fudged_image[mask]
-            imgs.append(temp)
-            if len(imgs) == batch_size:
-                preds = classifier_fn(np.array(imgs))
-                labels.extend(preds)
-                imgs = []
-        if len(imgs) > 0:
+            return temp
+        n_batches = np.ceil(len(data)/batch_size).astype(int)
+        for i_batch in tqdm(range(n_batches)) if progress_bar else range(n_batches):
+            start = i_batch*batch_size
+            end = np.clip(((i_batch+1)*batch_size), None, len(data)+1)
+            batch_data = data[start:end]
+            rows = batch_data
+            imgs = Parallel(n_jobs=n_jobs)(delayed(create_neighbor)(row)
+                                    for row in rows)
             preds = classifier_fn(np.array(imgs))
             labels.extend(preds)
         return data, np.array(labels)
